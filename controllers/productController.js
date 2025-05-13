@@ -71,21 +71,23 @@ const productController = {
   },
 
   // Get all products
-  getProducts: async (req, res) => {
-    try {
-      const products = await Product.find().sort({ createdAt: -1 });
-      res.status(200).json({
-        success: true,
-        products
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: 'Error fetching products',
-        error: error.message
-      });
-    }
+ // Get all products (no filters)
+getProducts: async (req, res) => {
+  try {
+    const products = await Product.find().sort({ createdAt: -1 });
+    res.status(200).json({
+      success: true,
+      count: products.length,
+      products
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server Error',
+      error: error.message
+    });
   }
+},
 };
 
 module.exports = productController;

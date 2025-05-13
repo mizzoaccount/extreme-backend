@@ -6,7 +6,7 @@ const upload = require('../middleware/uploadMiddleware');
 // Create a new product
 router.post('/', upload.array('images', 5), productController.createProduct);
 
-// Get all products
+// Simple GET endpoint for all products
 router.get('/', productController.getProducts);
 
 module.exports = router;
