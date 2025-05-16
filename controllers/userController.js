@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 //const { authenticate, authorize } = require('../middleware/auth');
 
 
-exports.loginUser = async (req, res) => {
+/*exports.loginUser = async (req, res) => {
   // Validate request
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -53,7 +53,81 @@ exports.loginUser = async (req, res) => {
     console.error(err.message);
     res.status(500).json({ errors: [{ msg: 'Server error' }] });
   }
+};*/
+
+exports.loginUser = async (req, res) => {
+  console.log("Received login request");
+
+  // Log request body
+  console.log("Request body:", req.body);
+
+  // Validate request
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log("Validation errors:", errors.array());
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { email, password } = req.body;
+
+  // Log extracted email and password
+  console.log("Extracted email:", email);
+  console.log("Extracted password:", password ? "[REDACTED]" : "undefined");
+
+  try {
+    // Check if user exists
+    //const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select('+password');
+
+    if (!user) {
+      console.log(`User not found with email: ${email}`);
+      return res.status(401).json({ errors: [{ msg: 'Invalid credentials' }] });
+    }
+
+    console.log("User found:", user.email);
+
+    // Check password
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      console.log("Password mismatch");
+      return res.status(401).json({ errors: [{ msg: 'Invalid credentials' }] });
+    }
+
+    console.log("Password matched");
+
+    // Create JWT token
+    const token = jwt.sign(
+      { userId: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    console.log("JWT token created");
+
+    // Return user info (without password) and token
+    const userResponse = {
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      role: user.role,
+      createdAt: user.createdAt,
+      token
+    };
+
+    console.log("Sending success response");
+
+    res.status(200).json({
+      success: true,
+      user: userResponse
+    });
+
+  } catch (err) {
+    console.error("Unexpected server error:", err.message);
+    res.status(500).json({ errors: [{ msg: 'Server error' }] });
+  }
 };
+
 
 exports.registerUser = async (req, res) => {
   // Validate request
