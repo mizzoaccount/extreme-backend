@@ -13,7 +13,7 @@ const productController = {
   createProduct: async (req, res) => {
     try {
       // Parse the JSON fields from FormData
-      const { name, designer, mainCategory, subCategory, brand, price, stock, attributes } = req.body;
+      const { name, description, mainCategory, subCategory, brand, price, stock, attributes } = req.body;
       
       // Parse attributes if it's a string
       const parsedAttributes = typeof attributes === 'string' ? JSON.parse(attributes) : attributes;
