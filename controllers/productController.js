@@ -42,7 +42,7 @@ const productController = {
       // Create new product
       const newProduct = new Product({
         name,
-        designer,
+        description,
         category: {
           main: mainCategory,
           sub: subCategory,
